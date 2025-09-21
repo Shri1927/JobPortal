@@ -5,8 +5,7 @@ import { Input } from './ui/input'
 import { Button } from './ui/button'
 import { Loader2 } from 'lucide-react'
 import { useDispatch, useSelector } from 'react-redux'
-import axios from 'axios'
-import { USER_API_END_POINT } from '@/utils/constant'
+import { updateProfile } from '@/api/api'
 import { setUser } from '@/redux/authSlice'
 import { toast } from 'sonner'
 
@@ -46,19 +45,14 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
         }
         try {
             setLoading(true);
-            const res = await axios.post(`${USER_API_END_POINT}/profile/update`, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                },
-                withCredentials: true
-            });
-            if (res.data.success) {
-                dispatch(setUser(res.data.user));
-                toast.success(res.data.message);
+            const res = await updateProfile(formData);
+            if (res.success) {
+                dispatch(setUser(res.user));
+                toast.success(res.message);
             }
         } catch (error) {
             console.log(error);
-            toast.error(error.response.data.message);
+            toast.error(error.response?.data?.message || "Failed to update profile");
         } finally{
             setLoading(false);
         }
